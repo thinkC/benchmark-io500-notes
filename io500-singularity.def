@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    # Preconfigure tzdata
+    ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime
+    echo 'Europe/London' > /etc/timezone
+
+    apt-get update && apt-get install -y \
+        build-essential \
+        libhdf5-dev \
+        git \
+        openmpi-bin \
+        s3fs \
+        tzdata \
+        autoconf \
+        automake \
+        libtool \
+        pkg-config \
+        vim \
+        wget \
+        curl
+
+    dpkg-reconfigure -f noninteractive tzdata
+
+
+    git clone https://github.com/IO500/io500.git /opt/io500
+    cd /opt/io500
+    ./prepare.sh
+    make
+
+
+%environment
+    export TZ="Europe/London"
+
+%runscript
+    exec "$@"
